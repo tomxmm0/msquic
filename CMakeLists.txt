@@ -169,9 +169,12 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /GL /Zi")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Zi")
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /OPT:REF /OPT:ICF")
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /OPT:REF /OPT:ICF")
 
+    # Configure PGO linker flags.
     set(QUIC_PGO_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/bin/winuser/pgo_${CMAKE_GENERATOR_PLATFORM}/msquic.pgd")
     if(QUIC_PGO)
+        # Configured for training mode. Use the previous PGD file if present.
         if(EXISTS "${QUIC_PGO_FILE}")
             message(STATUS "/GENPROFILE:PDG")
             set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /GENPROFILE:PGD=${QUIC_PGO_FILE}")
@@ -180,12 +183,13 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
             set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /GENPROFILE")
         endif()
     else()
+        # Just doing a normal build. Use the PGD file if present.
         if(EXISTS "${QUIC_PGO_FILE}")
             message(STATUS "Using profile-guided optimization")
             set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /USEPROFILE:PGD=${QUIC_PGO_FILE}")
         endif()
     endif()
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /OPT:REF /OPT:ICF")
+
     if(QUIC_STATIC_LINK_CRT)
         message(STATUS "Configuring for statically-linked CRT")
         set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
