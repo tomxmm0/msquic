@@ -39,6 +39,12 @@ This script runs quicinterop locally.
 .PARAMETER Test
     A particular test case to run.
 
+.PARAMETER Version
+    The initial version to use for the connection.
+
+.PARAMETER Serial
+    Runs the test cases serially.
+
 #>
 
 param (
@@ -80,7 +86,13 @@ param (
     [string]$Port = "",
 
     [Parameter(Mandatory = $false)]
-    [string]$Test = ""
+    [string]$Test = "",
+
+    [Parameter(Mandatory = $false)]
+    [string]$Version = "",
+
+    [Parameter(Mandatory = $false)]
+    [switch]$Serial = $false
 )
 
 Set-StrictMode -Version 'Latest'
@@ -144,6 +156,12 @@ if ($Port -ne "") {
 }
 if ($Test -ne "") {
     $ExtraArgs += " -test:$Test"
+}
+if ($Version -ne "") {
+    $ExtraArgs += " -version:$Version"
+}
+if ($Serial) {
+    $ExtraArgs += " -serial"
 }
 
 if ($ExtraArgs -ne "") {
